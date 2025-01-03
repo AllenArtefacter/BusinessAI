@@ -1,0 +1,23 @@
+name: Format Python code
+
+on:
+  push:
+    branches:
+      - main
+      - prod
+  pull_request:
+    branches:
+      - main
+      - prod
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: TruffleHog OSS
+        uses: trufflesecurity/trufflehog@v3.31.6

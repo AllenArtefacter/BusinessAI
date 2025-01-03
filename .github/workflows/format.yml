@@ -1,0 +1,54 @@
+name: Format Python code
+
+on:
+  push:
+    branches:
+      - main
+      - prod
+  pull_request:
+    branches:
+      - main
+      - prod
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install black isort
+
+      - name: Check Code format code with Black
+        run: |
+          black --check .
+          black_status=$?
+          if [ $black_status -eq 1 ]
+          then
+            black .
+            echo "Code is not formatted with Black. run ```black .``` to fix."
+          else
+            echo "Code is already formatted with Black."
+          fi
+
+      - name: Check import order with isort
+        run: |
+          isort --check --diff --profile black .
+          isort_status=$?
+          if [ $isort_status -eq 1 ]
+          then
+            isort .
+            echo "Import order is not organized with isort. run ```isort . --profile black``` to fix."
+          else
+            echo "Import order is already organized with isort."
+          fi
